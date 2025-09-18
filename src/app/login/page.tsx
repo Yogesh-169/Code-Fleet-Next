@@ -87,9 +87,19 @@ export default function LoginPage() {
 
             setSuccess('Login successful! Redirecting...');
 
-            // Redirect to dashboard or home page
+            // Redirect based on user role
             setTimeout(() => {
-                router.push('/');
+                const userRoles = data.user.roles || [];
+                
+                if (userRoles.includes('company_org_admin') || userRoles.includes('company')) {
+                    router.push('/company');
+                } else if (userRoles.includes('freelancer')) {
+                    router.push('/freelancer');
+                } else if (userRoles.includes('admin')) {
+                    router.push('/admin');
+                } else {
+                    router.push('/');
+                }
             }, 1500);
 
         } catch (err: any) {
