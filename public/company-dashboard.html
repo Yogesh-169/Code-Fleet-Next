@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - CodFleet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div x-data="companyDashboard()" class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-building text-2xl text-blue-600 mr-3"></i>
+                        <h1 class="text-xl font-bold text-gray-900">CodFleet Company Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600" x-text="userInfo?.email"></span>
+                        <button @click="logout" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Welcome Section -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">Welcome to your Company Dashboard</h2>
+                <p class="text-gray-600">Manage your projects, hire freelancers, and track your business growth.</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <i class="fas fa-project-diagram text-2xl text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Active Projects</p>
+                            <p class="text-2xl font-semibold text-gray-900">12</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <i class="fas fa-users text-2xl text-green-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Hired Freelancers</p>
+                            <p class="text-2xl font-semibold text-gray-900">8</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-full">
+                            <i class="fas fa-dollar-sign text-2xl text-yellow-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Total Spent</p>
+                            <p class="text-2xl font-semibold text-gray-900">$24,500</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-full">
+                            <i class="fas fa-star text-2xl text-purple-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600">Company Rating</p>
+                            <p class="text-2xl font-semibold text-gray-900">4.8</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Recent Projects -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Projects</h3>
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-medium text-gray-900">E-commerce Website Development</h4>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">In Progress</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">Building a modern e-commerce platform with React and Node.js</p>
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>Budget: $15,000</span>
+                                    <span>Deadline: Dec 15, 2024</span>
+                                </div>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-medium text-gray-900">Mobile App UI/UX Design</h4>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Completed</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">Complete UI/UX design for a fitness tracking mobile app</p>
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>Budget: $8,500</span>
+                                    <span>Completed: Nov 28, 2024</span>
+                                </div>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-medium text-gray-900">Database Optimization</h4>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Pending</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">Optimize existing database for better performance</p>
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>Budget: $3,200</span>
+                                    <span>Start Date: Dec 20, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Post New Project
+                            </button>
+                            <button class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-search mr-2"></i>
+                                Find Freelancers
+                            </button>
+                            <button class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                View Analytics
+                            </button>
+                            <button class="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-cog mr-2"></i>
+                                Account Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Company Info -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Company Information</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Business Name:</span>
+                                <span class="font-medium" x-text="userInfo?.companyInfo?.legalBusinessName || 'N/A'"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Industry:</span>
+                                <span class="font-medium" x-text="userInfo?.companyInfo?.industry || 'N/A'"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Employee Count:</span>
+                                <span class="font-medium" x-text="userInfo?.companyInfo?.employeeCount || 'N/A'"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Registration Date:</span>
+                                <span class="font-medium" x-text="new Date(userInfo?.createdAt).toLocaleDateString() || 'N/A'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function companyDashboard() {
+            return {
+                userInfo: null,
+
+                async init() {
+                    await this.getUserInfo();
+                },
+
+                async getUserInfo() {
+                    try {
+                        const token = localStorage.getItem('accessToken');
+                        if (!token) {
+                            window.location.href = '/login.html';
+                            return;
+                        }
+
+                        const response = await fetch('http://localhost:3000/api/v1/auth/me', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.userInfo = data.user;
+                        } else {
+                            window.location.href = '/login.html';
+                        }
+                    } catch (error) {
+                        console.error('Error getting user info:', error);
+                        window.location.href = '/login.html';
+                    }
+                },
+
+                async logout() {
+                    try {
+                        const token = localStorage.getItem('accessToken');
+                        if (token) {
+                            await fetch('http://localhost:3000/api/v1/auth/logout', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error during logout:', error);
+                    } finally {
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('refreshToken');
+                        window.location.href = '/login.html';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

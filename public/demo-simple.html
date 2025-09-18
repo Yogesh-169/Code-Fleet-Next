@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodFleet Google OAuth Demo (Simple)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .google-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .google-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .user-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            display: none;
+        }
+
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info p {
+            margin: 0.25rem 0;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .api-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .instructions {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .step {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .step-number {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚀 CodFleet</div>
+        <div class="subtitle">Google OAuth Demo (Simple)</div>
+        
+        <a id="googleLoginBtn" class="google-btn" href="#" onclick="startGoogleLogin()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+        </a>
+
+        <div id="status" class="status"></div>
+        <div id="userInfo" class="user-info"></div>
+
+        <div class="instructions">
+            <strong>Setup Instructions:</strong>
+            <div class="step">
+                <span class="step-number">1.</span> Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>
+            </div>
+            <div class="step">
+                <span class="step-number">2.</span> Navigate to APIs & Services > Credentials
+            </div>
+            <div class="step">
+                <span class="step-number">3.</span> Edit your OAuth 2.0 Client ID
+            </div>
+            <div class="step">
+                <span class="step-number">4.</span> Add <code>http://localhost:3002</code> to Authorized JavaScript origins
+            </div>
+            <div class="step">
+                <span class="step-number">5.</span> Add <code>http://localhost:3002/api/v1/auth/google/callback</code> to Authorized redirect URIs
+            </div>
+            <div class="step">
+                <span class="step-number">6.</span> Save and try again
+            </div>
+        </div>
+
+        <div class="api-info">
+            <strong>API Endpoints:</strong><br>
+            • GET /api/v1/auth/google/url<br>
+            • POST /api/v1/auth/google/login<br>
+            • POST /api/v1/auth/google/register<br>
+            • POST /api/v1/auth/google/disconnect
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let accessToken = null;
+        let refreshToken = null;
+
+        // Start Google login process
+        async function startGoogleLogin() {
+            showStatus('Getting Google OAuth URL...', 'info');
+            
+            try {
+                const response = await fetch('/api/v1/auth/google/url');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('Redirecting to Google...', 'info');
+                    // Redirect to Google OAuth
+                    window.location.href = data.authUrl;
+                } else {
+                    showStatus(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error getting OAuth URL:', error);
+                showStatus('Failed to get Google OAuth URL. Please try again.', 'error');
+            }
+        }
+
+        // Check if we're returning from OAuth callback
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const accessTokenParam = urlParams.get('access_token');
+            const refreshTokenParam = urlParams.get('refresh_token');
+            const provider = urlParams.get('provider');
+            const isNewUser = urlParams.get('is_new_user') === 'true';
+            const error = urlParams.get('error');
+
+            if (error) {
+                showStatus(`OAuth Error: ${error}`, 'error');
+                return;
+            }
+
+            if (accessTokenParam && refreshTokenParam) {
+                // We're returning from OAuth callback
+                accessToken = accessTokenParam;
+                refreshToken = refreshTokenParam;
+                
+                // Get user info from the token
+                getUserInfoFromToken(accessToken);
+                
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
+
+        // Get user info from access token
+        async function getUserInfoFromToken(token) {
+            try {
+                // Decode JWT token to get user info
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                currentUser = {
+                    id: payload.sub,
+                    email: payload.email,
+                    roles: payload.roles,
+                    firstName: 'User', // We'll get this from the API
+                    lastName: '',
+                    isEmailVerified: true,
+                    lastLoginAt: new Date().toISOString(),
+                    provider: 'google'
+                };
+
+                showStatus('Login successful!', 'success');
+                showUserInfo(currentUser);
+                updateButton('logout');
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                showStatus('Failed to decode user information', 'error');
+            }
+        }
+
+        // Show user information
+        function showUserInfo(user) {
+            const userInfoDiv = document.getElementById('userInfo');
+            userInfoDiv.innerHTML = `
+                <h3>Welcome, ${user.firstName} ${user.lastName}!</h3>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Roles:</strong> ${user.roles.join(', ')}</p>
+                <p><strong>Email Verified:</strong> ${user.isEmailVerified ? 'Yes' : 'No'}</p>
+                <p><strong>Provider:</strong> Google OAuth</p>
+                <p><strong>Last Login:</strong> ${new Date(user.lastLoginAt).toLocaleString()}</p>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            `;
+            userInfoDiv.style.display = 'block';
+        }
+
+        // Update button state
+        function updateButton(state) {
+            const btn = document.getElementById('googleLoginBtn');
+            if (state === 'logout') {
+                btn.innerHTML = 'Logout from Google';
+                btn.onclick = logout;
+                btn.style.background = '#dc3545';
+            } else {
+                btn.innerHTML = `
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                `;
+                btn.onclick = startGoogleLogin;
+                btn.style.background = '#4285f4';
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            if (accessToken) {
+                try {
+                    await fetch('/api/v1/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${accessToken}`
+                        },
+                        body: JSON.stringify({
+                            refreshToken: refreshToken,
+                            logoutAll: true
+                        })
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+
+            // Clear local state
+            currentUser = null;
+            accessToken = null;
+            refreshToken = null;
+
+            // Reset UI
+            document.getElementById('userInfo').style.display = 'none';
+            showStatus('Logged out successfully', 'info');
+            updateButton('login');
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

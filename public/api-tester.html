@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodFleet API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div x-data="apiTester()" class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">CodFleet API Tester</h1>
+            <p class="text-gray-600">Quick API testing tool for all registration endpoints</p>
+        </div>
+
+        <!-- Quick Test Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <button @click="testHealth" :disabled="loading"
+                    class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 disabled:opacity-50">
+                <i class="fas fa-heartbeat mr-2"></i>
+                Health Check
+            </button>
+            
+            <button @click="testCompanyRegistration" :disabled="loading"
+                    class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                <i class="fas fa-building mr-2"></i>
+                Test Company
+            </button>
+            
+            <button @click="testEducationalRegistration" :disabled="loading"
+                    class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 disabled:opacity-50">
+                <i class="fas fa-graduation-cap mr-2"></i>
+                Test Educational
+            </button>
+            
+            <button @click="testFreelancerRegistration" :disabled="loading"
+                    class="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 disabled:opacity-50">
+                <i class="fas fa-user-tie mr-2"></i>
+                Test Freelancer
+            </button>
+        </div>
+
+        <!-- Test Results -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            
+            <div class="space-y-4">
+                <template x-for="(test, index) in testResults" :key="index">
+                    <div class="border rounded-lg p-4" :class="test.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold" x-text="test.name"></h3>
+                            <span class="text-sm px-2 py-1 rounded-full" 
+                                  :class="test.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                  x-text="test.success ? 'SUCCESS' : 'FAILED'"></span>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2">
+                            <strong>Endpoint:</strong> <span x-text="test.endpoint"></span>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-2">
+                            <strong>Status:</strong> <span x-text="test.status"></span> | 
+                            <strong>Duration:</strong> <span x-text="test.duration + 'ms'"></span>
+                        </div>
+                        <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs overflow-x-auto">
+                            <pre x-text="JSON.stringify(test.response, null, 2)"></pre>
+                        </div>
+                    </div>
+                </template>
+                
+                <div x-show="testResults.length === 0" class="text-gray-500 text-center py-8">
+                    No tests run yet. Click the buttons above to test the APIs.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function apiTester() {
+            return {
+                loading: false,
+                testResults: [],
+                apiBaseUrl: 'http://localhost:3000',
+
+                async testHealth() {
+                    this.loading = true;
+                    const startTime = Date.now();
+                    
+                    try {
+                        const response = await fetch(`${this.apiBaseUrl}/api/health`);
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.addTestResult({
+                            name: 'Health Check',
+                            endpoint: 'GET /api/health',
+                            status: response.status,
+                            duration,
+                            success: response.ok,
+                            response: data
+                        });
+                    } catch (error) {
+                        this.addTestResult({
+                            name: 'Health Check',
+                            endpoint: 'GET /api/health',
+                            status: 0,
+                            duration: Date.now() - startTime,
+                            success: false,
+                            response: { error: error.message }
+                        });
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async testCompanyRegistration() {
+                    this.loading = true;
+                    const startTime = Date.now();
+                    
+                    const testData = {
+                        email: `testcompany${Date.now()}@demo.com`,
+                        password: 'MySecureCompanyPass2024!@#',
+                        legalBusinessName: 'Test Company Ltd',
+                        registrationNumber: '123456789',
+                        vatNumber: 'FI12345678',
+                        industry: 'Technology',
+                        employeeCount: '50-100',
+                        headquartersAddress: 'Helsinki, Finland',
+                        primaryContactPerson: 'John Doe',
+                        designation: 'CEO',
+                        phone: '+358123456789',
+                        billingAddress: 'Helsinki, Finland',
+                        iban: 'FI1234567890123456',
+                        userRolesSetup: 'Admin, Hiring Manager',
+                        twoFactorEnabled: false,
+                        informationAccurate: true,
+                        termsAccepted: true,
+                        responsibilitiesUnderstood: true
+                    };
+                    
+                    try {
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/company`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(testData)
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.addTestResult({
+                            name: 'Company Registration',
+                            endpoint: 'POST /api/v1/auth/register/company',
+                            status: response.status,
+                            duration,
+                            success: response.ok,
+                            response: data
+                        });
+                    } catch (error) {
+                        this.addTestResult({
+                            name: 'Company Registration',
+                            endpoint: 'POST /api/v1/auth/register/company',
+                            status: 0,
+                            duration: Date.now() - startTime,
+                            success: false,
+                            response: { error: error.message }
+                        });
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async testEducationalRegistration() {
+                    this.loading = true;
+                    const startTime = Date.now();
+                    
+                    const testData = {
+                        email: `testinstitute${Date.now()}@demo.com`,
+                        password: 'MySecureInstitutePass2024!@#',
+                        instituteName: 'Test University',
+                        accreditationNumber: 'ACC123456789',
+                        instituteType: 'university',
+                        websiteUrl: 'https://test.edu',
+                        headquartersAddress: 'Helsinki, Finland',
+                        primaryContactPerson: 'Jane Smith',
+                        designation: 'Head of Partnerships',
+                        phone: '+358123456789',
+                        programsOffered: ['Computer Science', 'Data Science'],
+                        courseLinks: ['https://test.edu/cs101'],
+                        partnershipAgreement: true,
+                        twoFactorMethod: 'app'
+                    };
+                    
+                    try {
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/educational-institute`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(testData)
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.addTestResult({
+                            name: 'Educational Institute Registration',
+                            endpoint: 'POST /api/v1/auth/register/educational-institute',
+                            status: response.status,
+                            duration,
+                            success: response.ok,
+                            response: data
+                        });
+                    } catch (error) {
+                        this.addTestResult({
+                            name: 'Educational Institute Registration',
+                            endpoint: 'POST /api/v1/auth/register/educational-institute',
+                            status: 0,
+                            duration: Date.now() - startTime,
+                            success: false,
+                            response: { error: error.message }
+                        });
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async testFreelancerRegistration() {
+                    this.loading = true;
+                    const startTime = Date.now();
+                    
+                    const testData = {
+                        email: `testfreelancer${Date.now()}@demo.com`,
+                        password: 'MySecureFreelancerPass2024!@#',
+                        fullName: 'Alex Johnson',
+                        dateOfBirth: '1990-01-01',
+                        countryOfCitizenship: 'Finland',
+                        finnishIdentityCode: '010190-123A',
+                        primaryAddress: 'Helsinki, Finland',
+                        iban: 'FI1234567890123456',
+                        taxRegistrationStatus: 'registered',
+                        vatStatus: 'not_vat_registered',
+                        twoFactorEnabled: false,
+                        informationAccurate: true,
+                        termsAccepted: true,
+                        falseInformationUnderstood: true
+                    };
+                    
+                    try {
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/freelancer`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(testData)
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.addTestResult({
+                            name: 'Freelancer Registration',
+                            endpoint: 'POST /api/v1/auth/register/freelancer',
+                            status: response.status,
+                            duration,
+                            success: response.ok,
+                            response: data
+                        });
+                    } catch (error) {
+                        this.addTestResult({
+                            name: 'Freelancer Registration',
+                            endpoint: 'POST /api/v1/auth/register/freelancer',
+                            status: 0,
+                            duration: Date.now() - startTime,
+                            success: false,
+                            response: { error: error.message }
+                        });
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                addTestResult(test) {
+                    this.testResults.unshift(test);
+                    // Keep only last 20 results
+                    if (this.testResults.length > 20) {
+                        this.testResults = this.testResults.slice(0, 20);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

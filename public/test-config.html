@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodFleet OAuth Config Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .config { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 CodFleet OAuth Configuration Test</h1>
+    
+    <div class="config">
+        <h3>Current Configuration:</h3>
+        <p><strong>Server Port:</strong> <span id="port">3002</span></p>
+        <p><strong>Base URL:</strong> <span id="baseUrl">Loading...</span></p>
+        <p><strong>Google Client ID:</strong> <span id="clientId">Loading...</span></p>
+    </div>
+
+    <div class="config">
+        <h3>Required Google Console Settings:</h3>
+        <p><strong>Authorized JavaScript origins:</strong></p>
+        <pre>http://localhost:3002</pre>
+        <p><strong>Authorized redirect URIs:</strong></p>
+        <pre>http://localhost:3002/api/v1/auth/google/callback</pre>
+    </div>
+
+    <div class="config">
+        <h3>Test API Endpoints:</h3>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="testGoogleUrl()">Test Google OAuth URL</button>
+        <button onclick="testGoogleLogin()">Test Google Login (with fake token)</button>
+        <button onclick="testGoogleRegister()">Test Google Register (with fake token)</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        async function testHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                showResult('Health Check', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('Health Check', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGoogleUrl() {
+            try {
+                const response = await fetch('/api/v1/auth/google/url');
+                const data = await response.json();
+                showResult('Google OAuth URL', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('Google OAuth URL', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGoogleLogin() {
+            try {
+                const response = await fetch('/api/v1/auth/google/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: 'fake-token-for-testing',
+                        deviceInfo: { userAgent: 'test', platform: 'test', browser: 'test' }
+                    })
+                });
+                const data = await response.json();
+                showResult('Google Login Test', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('Google Login Test', { error: error.message }, 'error');
+            }
+        }
+
+        async function testGoogleRegister() {
+            try {
+                const response = await fetch('/api/v1/auth/google/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: 'fake-token-for-testing',
+                        language: 'en',
+                        timezone: 'UTC',
+                        deviceInfo: { userAgent: 'test', platform: 'test', browser: 'test' }
+                    })
+                });
+                const data = await response.json();
+                showResult('Google Register Test', data, response.ok ? 'success' : 'error');
+            } catch (error) {
+                showResult('Google Register Test', { error: error.message }, 'error');
+            }
+        }
+
+        function showResult(title, data, type) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `config ${type}`;
+            resultDiv.innerHTML = `
+                <h4>${title} (${type.toUpperCase()})</h4>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        // Load configuration on page load
+        window.onload = async function() {
+            try {
+                const response = await fetch('/api/v1/auth/google/url');
+                const data = await response.json();
+                document.getElementById('baseUrl').textContent = window.location.origin;
+                document.getElementById('clientId').textContent = data.authUrl.includes('client_id=') ? 
+                    data.authUrl.split('client_id=')[1].split('&')[0] : 'Not found';
+            } catch (error) {
+                document.getElementById('baseUrl').textContent = 'Error loading config';
+                document.getElementById('clientId').textContent = 'Error loading config';
+            }
+        };
+    </script>
+</body>
+</html>

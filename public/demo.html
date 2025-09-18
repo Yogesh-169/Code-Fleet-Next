@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodFleet Google OAuth Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .google-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .google-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+        }
+
+        .google-btn:active {
+            transform: translateY(0);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .user-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+            display: none;
+        }
+
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info p {
+            margin: 0.25rem 0;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .api-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🚀 CodFleet</div>
+        <div class="subtitle">Google OAuth Demo</div>
+        
+        <button id="googleLoginBtn" class="google-btn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+        </button>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Authenticating...</p>
+        </div>
+
+        <div id="status" class="status"></div>
+        <div id="userInfo" class="user-info"></div>
+
+        <div class="api-info">
+            <strong>API Endpoints:</strong><br>
+            • GET /api/v1/auth/google/url<br>
+            • POST /api/v1/auth/google/login<br>
+            • POST /api/v1/auth/google/register<br>
+            • POST /api/v1/auth/google/disconnect
+        </div>
+    </div>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script>
+        let currentUser = null;
+        let accessToken = null;
+        let refreshToken = null;
+
+        // Initialize Google Sign-In
+        function initializeGoogleSignIn() {
+            google.accounts.id.initialize({
+                client_id: '41030008524-8ncad5tr1nht732u4mbkuqkljsvvlire.apps.googleusercontent.com',
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: true
+            });
+
+            // Render the button
+            google.accounts.id.renderButton(
+                document.getElementById('googleLoginBtn'),
+                {
+                    theme: 'outline',
+                    size: 'large',
+                    width: '100%',
+                    text: 'continue_with',
+                    shape: 'rectangular'
+                }
+            );
+        }
+
+        // Handle Google credential response
+        async function handleCredentialResponse(response) {
+            showLoading(true);
+            showStatus('Authenticating with Google...', 'info');
+
+            try {
+                // Try to login first
+                const loginResponse = await fetch('/api/v1/auth/google/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        idToken: response.credential,
+                        deviceInfo: {
+                            userAgent: navigator.userAgent,
+                            platform: navigator.platform,
+                            browser: getBrowserName()
+                        }
+                    })
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (loginResponse.ok) {
+                    // Login successful
+                    currentUser = loginData.user;
+                    accessToken = loginData.accessToken;
+                    refreshToken = loginData.refreshToken;
+                    
+                    showStatus('Login successful!', 'success');
+                    showUserInfo(loginData.user);
+                    updateButton('logout');
+                } else if (loginData.code === 'ACCOUNT_NOT_FOUND') {
+                    // Account not found, try to register
+                    const registerResponse = await fetch('/api/v1/auth/google/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            idToken: response.credential,
+                            language: 'en',
+                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                            deviceInfo: {
+                                userAgent: navigator.userAgent,
+                                platform: navigator.platform,
+                                browser: getBrowserName()
+                            }
+                        })
+                    });
+
+                    const registerData = await registerResponse.json();
+
+                    if (registerResponse.ok) {
+                        // Registration successful
+                        currentUser = registerData.user;
+                        accessToken = registerData.accessToken;
+                        refreshToken = registerData.refreshToken;
+                        
+                        showStatus('Registration successful! Welcome to CodFleet!', 'success');
+                        showUserInfo(registerData.user);
+                        updateButton('logout');
+                    } else {
+                        showStatus(`Registration failed: ${registerData.error}`, 'error');
+                    }
+                } else {
+                    showStatus(`Login failed: ${loginData.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showStatus('Authentication failed. Please try again.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Show user information
+        function showUserInfo(user) {
+            const userInfoDiv = document.getElementById('userInfo');
+            userInfoDiv.innerHTML = `
+                <h3>Welcome, ${user.firstName} ${user.lastName}!</h3>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Roles:</strong> ${user.roles.join(', ')}</p>
+                <p><strong>Email Verified:</strong> ${user.isEmailVerified ? 'Yes' : 'No'}</p>
+                <p><strong>Provider:</strong> Google OAuth</p>
+                <p><strong>Last Login:</strong> ${new Date(user.lastLoginAt).toLocaleString()}</p>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            `;
+            userInfoDiv.style.display = 'block';
+        }
+
+        // Update button state
+        function updateButton(state) {
+            const btn = document.getElementById('googleLoginBtn');
+            if (state === 'logout') {
+                btn.innerHTML = 'Logout from Google';
+                btn.onclick = logout;
+                btn.style.background = '#dc3545';
+            } else {
+                btn.innerHTML = `
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                `;
+                btn.onclick = null;
+                btn.style.background = '#4285f4';
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            if (accessToken) {
+                try {
+                    await fetch('/api/v1/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${accessToken}`
+                        },
+                        body: JSON.stringify({
+                            refreshToken: refreshToken,
+                            logoutAll: true
+                        })
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+
+            // Clear local state
+            currentUser = null;
+            accessToken = null;
+            refreshToken = null;
+
+            // Reset UI
+            document.getElementById('userInfo').style.display = 'none';
+            showStatus('Logged out successfully', 'info');
+            updateButton('login');
+            
+            // Clear Google session
+            google.accounts.id.disableAutoSelect();
+        }
+
+        // Show loading state
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Get browser name
+        function getBrowserName() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes('Chrome')) return 'Chrome';
+            if (userAgent.includes('Firefox')) return 'Firefox';
+            if (userAgent.includes('Safari')) return 'Safari';
+            if (userAgent.includes('Edge')) return 'Edge';
+            return 'Unknown';
+        }
+
+        // Initialize when page loads
+        window.onload = function() {
+            // Wait for Google library to load
+            if (typeof google !== 'undefined') {
+                initializeGoogleSignIn();
+            } else {
+                // Retry after a short delay
+                setTimeout(initializeGoogleSignIn, 1000);
+            }
+        };
+    </script>
+</body>
+</html>

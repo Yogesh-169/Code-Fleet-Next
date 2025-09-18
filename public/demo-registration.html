@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodFleet Registration API Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div x-data="registrationDemo()" class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">CodFleet Registration API Demo</h1>
+                    <p class="text-gray-600 mt-2">Test all registration endpoints and document upload functionality</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">API Base URL</div>
+                    <div class="font-mono text-lg" x-text="apiBaseUrl"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Status -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">API Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 border rounded-lg" :class="apiStatus.health ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'">
+                    <i class="fas fa-heartbeat text-2xl mb-2" :class="apiStatus.health ? 'text-green-500' : 'text-red-500'"></i>
+                    <div class="font-semibold">Health Check</div>
+                    <div class="text-sm" x-text="apiStatus.health ? 'Online' : 'Offline'"></div>
+                </div>
+                <div class="text-center p-4 border rounded-lg" :class="apiStatus.company ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'">
+                    <i class="fas fa-building text-2xl mb-2" :class="apiStatus.company ? 'text-green-500' : 'text-gray-400'"></i>
+                    <div class="font-semibold">Company API</div>
+                    <div class="text-sm" x-text="apiStatus.company ? 'Tested' : 'Not Tested'"></div>
+                </div>
+                <div class="text-center p-4 border rounded-lg" :class="apiStatus.educational ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'">
+                    <i class="fas fa-graduation-cap text-2xl mb-2" :class="apiStatus.educational ? 'text-green-500' : 'text-gray-400'"></i>
+                    <div class="font-semibold">Educational API</div>
+                    <div class="text-sm" x-text="apiStatus.educational ? 'Tested' : 'Not Tested'"></div>
+                </div>
+                <div class="text-center p-4 border rounded-lg" :class="apiStatus.freelancer ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'">
+                    <i class="fas fa-user-tie text-2xl mb-2" :class="apiStatus.freelancer ? 'text-green-500' : 'text-gray-400'"></i>
+                    <div class="font-semibold">Freelancer API</div>
+                    <div class="text-sm" x-text="apiStatus.freelancer ? 'Tested' : 'Not Tested'"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Forms -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Company Registration -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-building text-blue-500 mr-2"></i>
+                    Company Registration
+                </h3>
+                
+                <form @submit.prevent="registerCompany" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" x-model="forms.company.email" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" x-model="forms.company.password" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Legal Business Name</label>
+                        <input type="text" x-model="forms.company.legalBusinessName" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                        <input type="text" x-model="forms.company.registrationNumber" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">VAT Number</label>
+                        <input type="text" x-model="forms.company.vatNumber" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+                        <select x-model="forms.company.industry" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select Industry</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Primary Contact Person</label>
+                        <input type="text" x-model="forms.company.primaryContactPerson" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" x-model="forms.company.phone" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                        <input type="text" x-model="forms.company.iban" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.company.informationAccurate" required
+                                   class="mr-2">
+                            <span class="text-sm">Information is accurate and complete</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.company.termsAccepted" required
+                                   class="mr-2">
+                            <span class="text-sm">Agree to terms and conditions</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.company.responsibilitiesUnderstood" required
+                                   class="mr-2">
+                            <span class="text-sm">Understand responsibilities</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" :disabled="loading.company"
+                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-spinner fa-spin mr-2" x-show="loading.company"></i>
+                        Register Company
+                    </button>
+                </form>
+            </div>
+
+            <!-- Educational Institute Registration -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-graduation-cap text-green-500 mr-2"></i>
+                    Educational Institute Registration
+                </h3>
+                
+                <form @submit.prevent="registerEducational" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" x-model="forms.educational.email" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" x-model="forms.educational.password" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Institute Name</label>
+                        <input type="text" x-model="forms.educational.instituteName" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Accreditation Number</label>
+                        <input type="text" x-model="forms.educational.accreditationNumber" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Institute Type</label>
+                        <select x-model="forms.educational.instituteType" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="">Select Type</option>
+                            <option value="university">University</option>
+                            <option value="college">College</option>
+                            <option value="vocational_school">Vocational School</option>
+                            <option value="online_platform">Online Platform</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+                        <input type="url" x-model="forms.educational.websiteUrl" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Primary Contact Person</label>
+                        <input type="text" x-model="forms.educational.primaryContactPerson" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Programs Offered</label>
+                        <input type="text" x-model="forms.educational.programsOffered" required
+                               placeholder="Computer Science, Data Science, Software Engineering"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" x-model="forms.educational.phone" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.educational.partnershipAgreement" required
+                                   class="mr-2">
+                            <span class="text-sm">Agree to Partnership Agreement</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" :disabled="loading.educational"
+                            class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-spinner fa-spin mr-2" x-show="loading.educational"></i>
+                        Register Institute
+                    </button>
+                </form>
+            </div>
+
+            <!-- Freelancer Registration -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-user-tie text-purple-500 mr-2"></i>
+                    Freelancer Registration
+                </h3>
+                
+                <form @submit.prevent="registerFreelancer" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" x-model="forms.freelancer.email" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" x-model="forms.freelancer.password" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" x-model="forms.freelancer.fullName" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <input type="date" x-model="forms.freelancer.dateOfBirth" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Country of Citizenship</label>
+                        <select x-model="forms.freelancer.countryOfCitizenship" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Select Country</option>
+                            <option value="Finland">Finland</option>
+                            <option value="Sweden">Sweden</option>
+                            <option value="Norway">Norway</option>
+                            <option value="Denmark">Denmark</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Finnish Identity Code</label>
+                        <input type="text" x-model="forms.freelancer.finnishIdentityCode" required
+                               placeholder="010190-123A"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Primary Address</label>
+                        <input type="text" x-model="forms.freelancer.primaryAddress" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                        <input type="text" x-model="forms.freelancer.iban" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tax Registration Status</label>
+                        <select x-model="forms.freelancer.taxRegistrationStatus" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Select Status</option>
+                            <option value="registered">Registered</option>
+                            <option value="not_registered">Not Registered</option>
+                        </select>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.freelancer.informationAccurate" required
+                                   class="mr-2">
+                            <span class="text-sm">Information is accurate and complete</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.freelancer.termsAccepted" required
+                                   class="mr-2">
+                            <span class="text-sm">Agree to terms and conditions</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" x-model="forms.freelancer.falseInformationUnderstood" required
+                                   class="mr-2">
+                            <span class="text-sm">Understand false information consequences</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" :disabled="loading.freelancer"
+                            class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-spinner fa-spin mr-2" x-show="loading.freelancer"></i>
+                        Register Freelancer
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Document Upload Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-upload text-orange-500 mr-2"></i>
+                Document Upload Test
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-lg font-medium mb-3">Upload Documents</h4>
+                    <form @submit.prevent="uploadDocuments" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Select Files</label>
+                            <input type="file" @change="handleFileSelect" multiple
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        
+                        <div x-show="selectedFiles.length > 0">
+                            <h5 class="text-sm font-medium text-gray-700 mb-2">Selected Files:</h5>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <template x-for="file in selectedFiles" :key="file.name">
+                                    <li x-text="file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)'"></li>
+                                </template>
+                            </ul>
+                        </div>
+                        
+                        <button type="submit" :disabled="loading.upload || selectedFiles.length === 0"
+                                class="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-spinner fa-spin mr-2" x-show="loading.upload"></i>
+                            Upload Documents
+                        </button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-medium mb-3">Uploaded Documents</h4>
+                    <div x-show="uploadedDocuments.length === 0" class="text-gray-500 text-sm">
+                        No documents uploaded yet
+                    </div>
+                    <div x-show="uploadedDocuments.length > 0" class="space-y-2">
+                        <template x-for="doc in uploadedDocuments" :key="doc.id">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                                <div>
+                                    <div class="font-medium text-sm" x-text="doc.originalName"></div>
+                                    <div class="text-xs text-gray-500" x-text="doc.type + ' • ' + (doc.size / 1024).toFixed(1) + ' KB'"></div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs px-2 py-1 rounded-full" 
+                                          :class="doc.status === 'pending_review' ? 'bg-yellow-100 text-yellow-800' : 
+                                                  doc.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                                  'bg-red-100 text-red-800'"
+                                          x-text="doc.status"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Response Log -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-terminal text-gray-500 mr-2"></i>
+                API Response Log
+            </h3>
+            
+            <div class="bg-gray-900 text-green-400 p-4 rounded-md font-mono text-sm max-h-96 overflow-y-auto">
+                <template x-for="(log, index) in responseLog" :key="index">
+                    <div class="mb-2">
+                        <div class="text-blue-400" x-text="'[' + log.timestamp + '] ' + log.endpoint"></div>
+                        <div class="text-white" x-text="JSON.stringify(log.response, null, 2)"></div>
+                        <div class="text-gray-400 text-xs" x-text="'Status: ' + log.status + ' | Time: ' + log.duration + 'ms'"></div>
+                        <div class="border-t border-gray-700 mt-2 pt-2" x-show="index < responseLog.length - 1"></div>
+                    </div>
+                </template>
+                
+                <div x-show="responseLog.length === 0" class="text-gray-500">
+                    No API calls made yet. Try registering a user or uploading documents.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function registrationDemo() {
+            return {
+                apiBaseUrl: 'http://localhost:3000',
+                loading: {
+                    company: false,
+                    educational: false,
+                    freelancer: false,
+                    upload: false
+                },
+                apiStatus: {
+                    health: false,
+                    company: false,
+                    educational: false,
+                    freelancer: false
+                },
+                forms: {
+                    company: {
+                        email: 'testcompany@demo.com',
+                        password: 'MySecureCompanyPass2024!@#',
+                        legalBusinessName: 'Demo Company Ltd',
+                        registrationNumber: '123456789',
+                        vatNumber: 'FI12345678',
+                        industry: 'Technology',
+                        employeeCount: '50-100',
+                        headquartersAddress: 'Helsinki, Finland',
+                        primaryContactPerson: 'John Doe',
+                        designation: 'CEO',
+                        phone: '+358123456789',
+                        billingAddress: 'Helsinki, Finland',
+                        iban: 'FI1234567890123456',
+                        userRolesSetup: 'Admin, Hiring Manager',
+                        twoFactorEnabled: false,
+                        informationAccurate: true,
+                        termsAccepted: true,
+                        responsibilitiesUnderstood: true
+                    },
+                    educational: {
+                        email: 'testinstitute@demo.com',
+                        password: 'MySecureInstitutePass2024!@#',
+                        instituteName: 'Demo University',
+                        accreditationNumber: 'ACC123456789',
+                        instituteType: 'university',
+                        websiteUrl: 'https://demo.edu',
+                        headquartersAddress: 'Helsinki, Finland',
+                        primaryContactPerson: 'Jane Smith',
+                        designation: 'Head of Partnerships',
+                        phone: '+358123456789',
+                        programsOffered: 'Computer Science, Data Science, Software Engineering',
+                        courseLinks: 'https://demo.edu/cs101',
+                        partnershipAgreement: true,
+                        twoFactorMethod: 'app'
+                    },
+                    freelancer: {
+                        email: 'testfreelancer@demo.com',
+                        password: 'MySecureFreelancerPass2024!@#',
+                        fullName: 'Alex Johnson',
+                        dateOfBirth: '1990-01-01',
+                        countryOfCitizenship: 'Finland',
+                        finnishIdentityCode: '010190-123A',
+                        primaryAddress: 'Helsinki, Finland',
+                        iban: 'FI1234567890123456',
+                        taxRegistrationStatus: 'registered',
+                        vatStatus: 'not_vat_registered',
+                        twoFactorEnabled: false,
+                        informationAccurate: true,
+                        termsAccepted: true,
+                        falseInformationUnderstood: true
+                    }
+                },
+                selectedFiles: [],
+                uploadedDocuments: [],
+                responseLog: [],
+
+                async init() {
+                    await this.checkApiHealth();
+                },
+
+                async checkApiHealth() {
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(`${this.apiBaseUrl}/api/health`);
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.apiStatus.health = response.ok;
+                        this.logResponse('GET /api/health', response.status, data, duration);
+                    } catch (error) {
+                        this.apiStatus.health = false;
+                        this.logResponse('GET /api/health', 0, { error: error.message }, 0);
+                    }
+                },
+
+                async registerCompany() {
+                    this.loading.company = true;
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/company`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.forms.company)
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.apiStatus.company = response.ok;
+                        this.logResponse('POST /api/v1/auth/register/company', response.status, data, duration);
+                        
+                        if (response.ok) {
+                            this.showNotification('Company registered successfully!', 'success');
+                        } else {
+                            this.showNotification('Company registration failed: ' + data.error, 'error');
+                        }
+                    } catch (error) {
+                        this.logResponse('POST /api/v1/auth/register/company', 0, { error: error.message }, 0);
+                        this.showNotification('Company registration failed: ' + error.message, 'error');
+                    } finally {
+                        this.loading.company = false;
+                    }
+                },
+
+                async registerEducational() {
+                    this.loading.educational = true;
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/educational-institute`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ...this.forms.educational,
+                                programsOffered: this.forms.educational.programsOffered.split(',').map(p => p.trim()),
+                                courseLinks: this.forms.educational.courseLinks.split(',').map(c => c.trim())
+                            })
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.apiStatus.educational = response.ok;
+                        this.logResponse('POST /api/v1/auth/register/educational-institute', response.status, data, duration);
+                        
+                        if (response.ok) {
+                            this.showNotification('Educational institute registered successfully!', 'success');
+                        } else {
+                            this.showNotification('Educational institute registration failed: ' + data.error, 'error');
+                        }
+                    } catch (error) {
+                        this.logResponse('POST /api/v1/auth/register/educational-institute', 0, { error: error.message }, 0);
+                        this.showNotification('Educational institute registration failed: ' + error.message, 'error');
+                    } finally {
+                        this.loading.educational = false;
+                    }
+                },
+
+                async registerFreelancer() {
+                    this.loading.freelancer = true;
+                    try {
+                        const startTime = Date.now();
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/auth/register/freelancer`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.forms.freelancer)
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.apiStatus.freelancer = response.ok;
+                        this.logResponse('POST /api/v1/auth/register/freelancer', response.status, data, duration);
+                        
+                        if (response.ok) {
+                            this.showNotification('Freelancer registered successfully!', 'success');
+                        } else {
+                            this.showNotification('Freelancer registration failed: ' + data.error, 'error');
+                        }
+                    } catch (error) {
+                        this.logResponse('POST /api/v1/auth/register/freelancer', 0, { error: error.message }, 0);
+                        this.showNotification('Freelancer registration failed: ' + error.message, 'error');
+                    } finally {
+                        this.loading.freelancer = false;
+                    }
+                },
+
+                handleFileSelect(event) {
+                    this.selectedFiles = Array.from(event.target.files);
+                },
+
+                async uploadDocuments() {
+                    if (this.selectedFiles.length === 0) return;
+                    
+                    this.loading.upload = true;
+                    try {
+                        const formData = new FormData();
+                        this.selectedFiles.forEach(file => {
+                            formData.append('document', file);
+                        });
+
+                        const startTime = Date.now();
+                        const response = await fetch(`${this.apiBaseUrl}/api/v1/documents/upload`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        const duration = Date.now() - startTime;
+                        
+                        this.logResponse('POST /api/v1/documents/upload', response.status, data, duration);
+                        
+                        if (response.ok) {
+                            this.uploadedDocuments = [...this.uploadedDocuments, ...data.documents];
+                            this.selectedFiles = [];
+                            this.showNotification('Documents uploaded successfully!', 'success');
+                        } else {
+                            this.showNotification('Document upload failed: ' + data.error, 'error');
+                        }
+                    } catch (error) {
+                        this.logResponse('POST /api/v1/documents/upload', 0, { error: error.message }, 0);
+                        this.showNotification('Document upload failed: ' + error.message, 'error');
+                    } finally {
+                        this.loading.upload = false;
+                    }
+                },
+
+                logResponse(endpoint, status, response, duration) {
+                    this.responseLog.unshift({
+                        timestamp: new Date().toLocaleTimeString(),
+                        endpoint,
+                        status,
+                        response,
+                        duration
+                    });
+                    
+                    // Keep only last 10 responses
+                    if (this.responseLog.length > 10) {
+                        this.responseLog = this.responseLog.slice(0, 10);
+                    }
+                },
+
+                showNotification(message, type) {
+                    // Simple notification - in production you'd use a proper notification library
+                    const notification = document.createElement('div');
+                    notification.className = `fixed top-4 right-4 p-4 rounded-md text-white z-50 ${
+                        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                    }`;
+                    notification.textContent = message;
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 5000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

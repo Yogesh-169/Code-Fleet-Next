@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join CodFleet - Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div x-data="registrationForm()" class="min-h-screen py-8">
+        <!-- Header -->
+        <div class="container mx-auto px-4 mb-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Join CodFleet</h1>
+                <p class="text-gray-600">Choose your registration type and get started</p>
+            </div>
+        </div>
+
+        <!-- User Type Selection -->
+        <div class="container mx-auto px-4 mb-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">How would you like to join CodFleet?</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <button @click="selectUserType('company')" 
+                                :class="selectedUserType === 'company' ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'"
+                                class="p-6 border-2 border-gray-200 rounded-lg text-center transition-all">
+                            <i class="fas fa-building text-4xl text-blue-500 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Company</h3>
+                            <p class="text-gray-600 text-sm">Post projects and hire freelancers</p>
+                        </button>
+                        
+                        <button @click="selectUserType('educational_institute')" 
+                                :class="selectedUserType === 'educational_institute' ? 'ring-2 ring-green-500 bg-green-50' : 'hover:bg-gray-50'"
+                                class="p-6 border-2 border-gray-200 rounded-lg text-center transition-all">
+                            <i class="fas fa-graduation-cap text-4xl text-green-500 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Educational Institute</h3>
+                            <p class="text-gray-600 text-sm">Partner with us for student programs</p>
+                        </button>
+                        
+                        <button @click="selectUserType('freelancer')" 
+                                :class="selectedUserType === 'freelancer' ? 'ring-2 ring-purple-500 bg-purple-50' : 'hover:bg-gray-50'"
+                                class="p-6 border-2 border-gray-200 rounded-lg text-center transition-all">
+                            <i class="fas fa-user-tie text-4xl text-purple-500 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Freelancer</h3>
+                            <p class="text-gray-600 text-sm">Find projects and build your career</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div x-show="selectedUserType" class="container mx-auto px-4">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-xl p-8">
+                    <!-- Progress Indicator -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                                     :class="currentStep >= 1 ? 'bg-blue-500' : 'bg-gray-300'">1</div>
+                                <span class="ml-2 text-sm font-medium" :class="currentStep >= 1 ? 'text-blue-600' : 'text-gray-500'">Basic Info</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-200 mx-4"></div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                                     :class="currentStep >= 2 ? 'bg-blue-500' : 'bg-gray-300'">2</div>
+                                <span class="ml-2 text-sm font-medium" :class="currentStep >= 2 ? 'text-blue-600' : 'text-gray-500'">Details</span>
+                            </div>
+                            <div class="flex-1 h-0.5 bg-gray-200 mx-4"></div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                                     :class="currentStep >= 3 ? 'bg-blue-500' : 'bg-gray-300'">3</div>
+                                <span class="ml-2 text-sm font-medium" :class="currentStep >= 3 ? 'text-blue-600' : 'text-gray-500'">Documents</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Basic Information -->
+                    <div x-show="currentStep === 1">
+                        <h3 class="text-2xl font-semibold mb-6">Basic Information</h3>
+                        
+                        <form @submit.prevent="nextStep" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                                    <input type="email" x-model="formData.email" required
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                                    <div class="relative">
+                                        <input :type="showPassword ? 'text' : 'password'" x-model="formData.password" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
+                                        <button type="button" @click="showPassword = !showPassword"
+                                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                            <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                                        </button>
+                                    </div>
+                                    <div class="mt-1 text-xs text-gray-500">
+                                        Must be at least 12 characters with uppercase, lowercase, number, and special character
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                                    <input type="tel" x-model="formData.phone" required
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Language Preference</label>
+                                    <select x-model="formData.language"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="en">English</option>
+                                        <option value="fi">Finnish</option>
+                                        <option value="sv">Swedish</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" 
+                                        class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Next: Details <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Step 2: Type-specific Details -->
+                    <div x-show="currentStep === 2">
+                        <h3 class="text-2xl font-semibold mb-6">
+                            <span x-text="selectedUserType === 'company' ? 'Company Details' : 
+                                         selectedUserType === 'educational_institute' ? 'Institute Details' : 
+                                         'Personal Details'"></span>
+                        </h3>
+
+                        <!-- Company Details -->
+                        <div x-show="selectedUserType === 'company'">
+                            <form @submit.prevent="nextStep" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Legal Business Name *</label>
+                                        <input type="text" x-model="formData.legalBusinessName" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Registration Number *</label>
+                                        <input type="text" x-model="formData.registrationNumber" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">VAT Number *</label>
+                                        <input type="text" x-model="formData.vatNumber" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
+                                        <select x-model="formData.industry" required
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="">Select Industry</option>
+                                            <option value="Technology">Technology</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Manufacturing">Manufacturing</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Retail">Retail</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Employee Count</label>
+                                        <select x-model="formData.employeeCount"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="">Select Range</option>
+                                            <option value="1-10">1-10</option>
+                                            <option value="11-50">11-50</option>
+                                            <option value="51-100">51-100</option>
+                                            <option value="101-500">101-500</option>
+                                            <option value="500+">500+</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Primary Contact Person *</label>
+                                        <input type="text" x-model="formData.primaryContactPerson" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Headquarters Address *</label>
+                                    <textarea x-model="formData.headquartersAddress" required rows="3"
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">IBAN *</label>
+                                    <input type="text" x-model="formData.iban" required
+                                           placeholder="FI1234567890123456"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium text-gray-900">Compliance & Agreements</h4>
+                                    <div class="space-y-3">
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.informationAccurate" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I confirm that all information provided is accurate and complete *</span>
+                                        </label>
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.termsAccepted" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and Conditions</a> *</span>
+                                        </label>
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.responsibilitiesUnderstood" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I understand my responsibilities as a company on CodFleet *</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between">
+                                    <button type="button" @click="prevStep"
+                                            class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                                        <i class="fas fa-arrow-left mr-2"></i> Back
+                                    </button>
+                                    <button type="submit" 
+                                            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                        Next: Documents <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Educational Institute Details -->
+                        <div x-show="selectedUserType === 'educational_institute'">
+                            <form @submit.prevent="nextStep" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Institute Name *</label>
+                                        <input type="text" x-model="formData.instituteName" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Accreditation Number *</label>
+                                        <input type="text" x-model="formData.accreditationNumber" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Institute Type *</label>
+                                        <select x-model="formData.instituteType" required
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                            <option value="">Select Type</option>
+                                            <option value="university">University</option>
+                                            <option value="college">College</option>
+                                            <option value="vocational_school">Vocational School</option>
+                                            <option value="online_platform">Online Platform</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Website URL *</label>
+                                        <input type="url" x-model="formData.websiteUrl" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Primary Contact Person *</label>
+                                        <input type="text" x-model="formData.primaryContactPerson" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Designation *</label>
+                                        <input type="text" x-model="formData.designation" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Programs Offered *</label>
+                                    <textarea x-model="formData.programsOffered" required rows="3"
+                                              placeholder="Computer Science, Data Science, Software Engineering"
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+                                    <div class="mt-1 text-xs text-gray-500">Separate multiple programs with commas</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Course Links</label>
+                                    <textarea x-model="formData.courseLinks" rows="2"
+                                              placeholder="https://your-institute.edu/cs101, https://your-institute.edu/ds201"
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+                                    <div class="mt-1 text-xs text-gray-500">Separate multiple links with commas</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Headquarters Address *</label>
+                                    <textarea x-model="formData.headquartersAddress" required rows="3"
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium text-gray-900">Partnership Agreement</h4>
+                                    <label class="flex items-start">
+                                        <input type="checkbox" x-model="formData.partnershipAgreement" required
+                                               class="mt-1 mr-3">
+                                        <span class="text-sm text-gray-700">I agree to the <a href="#" class="text-green-600 hover:underline">Partnership Agreement</a> and understand the terms of collaboration with CodFleet *</span>
+                                    </label>
+                                </div>
+
+                                <div class="flex justify-between">
+                                    <button type="button" @click="prevStep"
+                                            class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                                        <i class="fas fa-arrow-left mr-2"></i> Back
+                                    </button>
+                                    <button type="submit" 
+                                            class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                                        Next: Documents <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Freelancer Details -->
+                        <div x-show="selectedUserType === 'freelancer'">
+                            <form @submit.prevent="nextStep" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                        <input type="text" x-model="formData.fullName" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
+                                        <input type="date" x-model="formData.dateOfBirth" required
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Country of Citizenship *</label>
+                                        <select x-model="formData.countryOfCitizenship" required
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                            <option value="">Select Country</option>
+                                            <option value="Finland">Finland</option>
+                                            <option value="Sweden">Sweden</option>
+                                            <option value="Norway">Norway</option>
+                                            <option value="Denmark">Denmark</option>
+                                            <option value="Estonia">Estonia</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Finnish Identity Code *</label>
+                                        <input type="text" x-model="formData.finnishIdentityCode" required
+                                               placeholder="010190-123A"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Primary Address *</label>
+                                    <textarea x-model="formData.primaryAddress" required rows="3"
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tax Registration Status *</label>
+                                        <select x-model="formData.taxRegistrationStatus" required
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                            <option value="">Select Status</option>
+                                            <option value="registered">Registered</option>
+                                            <option value="not_registered">Not Registered</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">VAT Status</label>
+                                        <select x-model="formData.vatStatus"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                            <option value="">Select Status</option>
+                                            <option value="vat_registered">VAT Registered</option>
+                                            <option value="not_vat_registered">Not VAT Registered</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">IBAN *</label>
+                                    <input type="text" x-model="formData.iban" required
+                                           placeholder="FI1234567890123456"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                </div>
+
+                                <div class="space-y-4">
+                                    <h4 class="text-lg font-medium text-gray-900">Compliance & Agreements</h4>
+                                    <div class="space-y-3">
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.informationAccurate" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I confirm that all information provided is accurate and complete *</span>
+                                        </label>
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.termsAccepted" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I agree to the <a href="#" class="text-purple-600 hover:underline">Terms and Conditions</a> *</span>
+                                        </label>
+                                        <label class="flex items-start">
+                                            <input type="checkbox" x-model="formData.falseInformationUnderstood" required
+                                                   class="mt-1 mr-3">
+                                            <span class="text-sm text-gray-700">I understand the consequences of providing false information *</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between">
+                                    <button type="button" @click="prevStep"
+                                            class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                                        <i class="fas fa-arrow-left mr-2"></i> Back
+                                    </button>
+                                    <button type="submit" 
+                                            class="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                                        Next: Documents <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Document Upload -->
+                    <div x-show="currentStep === 3">
+                        <h3 class="text-2xl font-semibold mb-6">Document Upload</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-blue-900">Required Documents</h4>
+                                        <p class="text-sm text-blue-700 mt-1">
+                                            Please upload the required documents for verification. All documents will be reviewed by our team.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Document Upload Area -->
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors"
+                                 @dragover.prevent
+                                 @drop.prevent="handleFileDrop($event)"
+                                 @click="$refs.fileInput.click()">
+                                <input type="file" x-ref="fileInput" @change="handleFileSelect($event)" multiple
+                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                       class="hidden">
+                                
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">Upload Documents</h4>
+                                <p class="text-gray-600 mb-4">Drag and drop files here, or click to select files</p>
+                                <p class="text-sm text-gray-500">Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB each)</p>
+                            </div>
+
+                            <!-- Selected Files -->
+                            <div x-show="selectedFiles.length > 0" class="space-y-4">
+                                <h4 class="text-lg font-medium text-gray-900">Selected Files</h4>
+                                <div class="space-y-3">
+                                    <template x-for="(file, index) in selectedFiles" :key="index">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-file text-gray-500 mr-3"></i>
+                                                <div>
+                                                    <div class="font-medium text-gray-900" x-text="file.name"></div>
+                                                    <div class="text-sm text-gray-500" x-text="(file.size / 1024 / 1024).toFixed(2) + ' MB'"></div>
+                                                </div>
+                                            </div>
+                                            <button @click="removeFile(index)"
+                                                    class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Document Requirements -->
+                            <div class="bg-gray-50 rounded-lg p-6">
+                                <h4 class="font-medium text-gray-900 mb-4">Document Requirements by User Type</h4>
+                                
+                                <div x-show="selectedUserType === 'company'">
+                                    <ul class="space-y-2 text-sm text-gray-700">
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Business registration certificate
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            VAT registration certificate
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Bank account verification
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Identity document of authorized person
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div x-show="selectedUserType === 'educational_institute'">
+                                    <ul class="space-y-2 text-sm text-gray-700">
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Accreditation certificate
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Insurance documentation
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Partnership agreement (if applicable)
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Authorized representative ID
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div x-show="selectedUserType === 'freelancer'">
+                                    <ul class="space-y-2 text-sm text-gray-700">
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Passport or national ID
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Finnish identity code verification
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Tax registration certificate
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fas fa-check text-green-500 mr-2"></i>
+                                            Bank account verification
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <button type="button" @click="prevStep"
+                                        class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition-colors">
+                                    <i class="fas fa-arrow-left mr-2"></i> Back
+                                </button>
+                                <button @click="submitRegistration" :disabled="isSubmitting"
+                                        class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                                    <i class="fas fa-spinner fa-spin mr-2" x-show="isSubmitting"></i>
+                                    <span x-text="isSubmitting ? 'Registering...' : 'Complete Registration'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div x-show="showSuccessModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+                <div class="text-center">
+                    <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-2">Registration Successful!</h3>
+                    <p class="text-gray-600 mb-6">Your account has been created successfully. Please check your email for verification instructions.</p>
+                    <button @click="showSuccessModal = false; resetForm()"
+                            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function registrationForm() {
+            return {
+                selectedUserType: '',
+                currentStep: 1,
+                showPassword: false,
+                selectedFiles: [],
+                isSubmitting: false,
+                showSuccessModal: false,
+                formData: {
+                    email: '',
+                    password: '',
+                    phone: '',
+                    language: 'en',
+                    // Company fields
+                    legalBusinessName: '',
+                    registrationNumber: '',
+                    vatNumber: '',
+                    industry: '',
+                    employeeCount: '',
+                    headquartersAddress: '',
+                    primaryContactPerson: '',
+                    designation: '',
+                    iban: '',
+                    informationAccurate: false,
+                    termsAccepted: false,
+                    responsibilitiesUnderstood: false,
+                    // Educational Institute fields
+                    instituteName: '',
+                    accreditationNumber: '',
+                    instituteType: '',
+                    websiteUrl: '',
+                    programsOffered: '',
+                    courseLinks: '',
+                    partnershipAgreement: false,
+                    // Freelancer fields
+                    fullName: '',
+                    dateOfBirth: '',
+                    countryOfCitizenship: '',
+                    finnishIdentityCode: '',
+                    primaryAddress: '',
+                    taxRegistrationStatus: '',
+                    vatStatus: '',
+                    falseInformationUnderstood: false
+                },
+
+                selectUserType(type) {
+                    this.selectedUserType = type;
+                    this.currentStep = 1;
+                    this.resetForm();
+                },
+
+                nextStep() {
+                    if (this.currentStep < 3) {
+                        this.currentStep++;
+                    }
+                },
+
+                prevStep() {
+                    if (this.currentStep > 1) {
+                        this.currentStep--;
+                    }
+                },
+
+                handleFileSelect(event) {
+                    const files = Array.from(event.target.files);
+                    this.selectedFiles = [...this.selectedFiles, ...files];
+                },
+
+                handleFileDrop(event) {
+                    const files = Array.from(event.dataTransfer.files);
+                    this.selectedFiles = [...this.selectedFiles, ...files];
+                },
+
+                removeFile(index) {
+                    this.selectedFiles.splice(index, 1);
+                },
+
+                async submitRegistration() {
+                    this.isSubmitting = true;
+                    
+                    try {
+                        // Prepare form data
+                        const formData = new FormData();
+                        
+                        // Add registration data
+                        const registrationData = {
+                            userType: this.selectedUserType,
+                            email: this.formData.email,
+                            password: this.formData.password,
+                            phone: this.formData.phone,
+                            language: this.formData.language,
+                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                        };
+
+                        // Add type-specific data
+                        if (this.selectedUserType === 'company') {
+                            Object.assign(registrationData, {
+                                legalBusinessName: this.formData.legalBusinessName,
+                                registrationNumber: this.formData.registrationNumber,
+                                vatNumber: this.formData.vatNumber,
+                                industry: this.formData.industry,
+                                employeeCount: this.formData.employeeCount,
+                                headquartersAddress: this.formData.headquartersAddress,
+                                primaryContactPerson: this.formData.primaryContactPerson,
+                                designation: this.formData.designation,
+                                iban: this.formData.iban,
+                                informationAccurate: this.formData.informationAccurate,
+                                termsAccepted: this.formData.termsAccepted,
+                                responsibilitiesUnderstood: this.formData.responsibilitiesUnderstood
+                            });
+                        } else if (this.selectedUserType === 'educational_institute') {
+                            Object.assign(registrationData, {
+                                instituteName: this.formData.instituteName,
+                                accreditationNumber: this.formData.accreditationNumber,
+                                instituteType: this.formData.instituteType,
+                                websiteUrl: this.formData.websiteUrl,
+                                programsOffered: this.formData.programsOffered.split(',').map(p => p.trim()),
+                                courseLinks: this.formData.courseLinks.split(',').map(c => c.trim()),
+                                headquartersAddress: this.formData.headquartersAddress,
+                                primaryContactPerson: this.formData.primaryContactPerson,
+                                designation: this.formData.designation,
+                                partnershipAgreement: this.formData.partnershipAgreement
+                            });
+                        } else if (this.selectedUserType === 'freelancer') {
+                            Object.assign(registrationData, {
+                                fullName: this.formData.fullName,
+                                dateOfBirth: this.formData.dateOfBirth,
+                                countryOfCitizenship: this.formData.countryOfCitizenship,
+                                finnishIdentityCode: this.formData.finnishIdentityCode,
+                                primaryAddress: this.formData.primaryAddress,
+                                taxRegistrationStatus: this.formData.taxRegistrationStatus,
+                                vatStatus: this.formData.vatStatus,
+                                iban: this.formData.iban,
+                                informationAccurate: this.formData.informationAccurate,
+                                termsAccepted: this.formData.termsAccepted,
+                                falseInformationUnderstood: this.formData.falseInformationUnderstood
+                            });
+                        }
+
+                        formData.append('data', JSON.stringify(registrationData));
+
+                        // Add files
+                        this.selectedFiles.forEach(file => {
+                            formData.append('document', file);
+                        });
+
+                        // Submit registration
+                        const response = await fetch('http://localhost:3000/api/v1/auth/register/company-with-docs', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccessModal = true;
+                        } else {
+                            alert('Registration failed: ' + result.error);
+                        }
+                    } catch (error) {
+                        alert('Registration failed: ' + error.message);
+                    } finally {
+                        this.isSubmitting = false;
+                    }
+                },
+
+                resetForm() {
+                    this.currentStep = 1;
+                    this.selectedFiles = [];
+                    this.isSubmitting = false;
+                    this.showSuccessModal = false;
+                    this.formData = {
+                        email: '',
+                        password: '',
+                        phone: '',
+                        language: 'en',
+                        legalBusinessName: '',
+                        registrationNumber: '',
+                        vatNumber: '',
+                        industry: '',
+                        employeeCount: '',
+                        headquartersAddress: '',
+                        primaryContactPerson: '',
+                        designation: '',
+                        iban: '',
+                        informationAccurate: false,
+                        termsAccepted: false,
+                        responsibilitiesUnderstood: false,
+                        instituteName: '',
+                        accreditationNumber: '',
+                        instituteType: '',
+                        websiteUrl: '',
+                        programsOffered: '',
+                        courseLinks: '',
+                        partnershipAgreement: false,
+                        fullName: '',
+                        dateOfBirth: '',
+                        countryOfCitizenship: '',
+                        finnishIdentityCode: '',
+                        primaryAddress: '',
+                        taxRegistrationStatus: '',
+                        vatStatus: '',
+                        falseInformationUnderstood: false
+                    };
+                }
+            }
+        }
+    </script>
+</body>
+</html>
